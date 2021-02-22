@@ -1,6 +1,5 @@
 package com.example.awesomeappjava;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -13,8 +12,6 @@ public class DetailImageActivity extends AppCompatActivity {
     private int img = 0;
     private String title = "";
     private String desc = "";
-
-    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
