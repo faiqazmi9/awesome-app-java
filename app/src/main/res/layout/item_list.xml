@@ -23,25 +23,13 @@
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@+id/image_list"
+        app:layout_constraintStart_toEndOf="@+id/image"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlCompat"
         tools:text="Image 1" />
-
-    <TextView
-        android:id="@+id/tv_info"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        app:layout_constraintStart_toEndOf="@+id/image_list"
-        app:layout_constraintTop_toBottomOf="@+id/title_list"
-        tools:ignore="RtlCompat"
-        tools:text="20 likes · 33 comments" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

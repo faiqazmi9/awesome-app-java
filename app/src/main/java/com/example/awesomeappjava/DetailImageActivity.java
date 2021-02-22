@@ -8,10 +8,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
-
-import timber.log.Timber;
-
 public class DetailImageActivity extends AppCompatActivity {
 
     private int img = 0;
@@ -36,23 +32,7 @@ public class DetailImageActivity extends AppCompatActivity {
         TextView mTvTitle = findViewById(R.id.title);
         TextView mTvDescription = findViewById(R.id.description);
 
-        if (img != 0) {
-            try {
-                Glide.with(mContext).load(img)
-                        .placeholder(R.drawable.ic_launcher_foreground)
-                        .into(mIv);
-            } catch (Exception ex) {
-                Timber.e(ex);
-            }
-        } else {
-            try {
-                Glide.with(mContext).load(R.drawable.ic_launcher_foreground)
-                        .placeholder(R.drawable.ic_launcher_foreground)
-                        .into(mIv);
-            } catch (Exception ex) {
-                Timber.e(ex);
-            }
-        }
+        mIv.setImageResource(img);
         mTvTitle.setText(title);
         mTvDescription.setText(desc);
     }
