@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:background="#FFFFFF"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/image_list"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/title_list"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/image_list"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="RtlCompat"
+        tools:text="Image 1" />
+
+    <TextView
+        android:id="@+id/tv_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintStart_toEndOf="@+id/image_list"
+        app:layout_constraintTop_toBottomOf="@+id/title_list"
+        tools:ignore="RtlCompat"
+        tools:text="20 likes · 33 comments" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
