@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,13 +17,14 @@ import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
     public static final int SPAN_COUNT_ONE = 1;
-    public static final int SPAN_COUNT_TWO = 3;
+    public static final int SPAN_COUNT_TWO = 2;
 
     private static final int VIEW_TYPE_SMALL = 1;
     private static final int VIEW_TYPE_BIG = 2;
 
     private List mItems;
     private GridLayoutManager mLayoutManager;
+    private ItemOnClickListener itemOnClickListener;
 
     public ItemAdapter(List items, GridLayoutManager layoutManager) {
         mItems = items;
@@ -55,6 +57,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         Item item = (Item) mItems.get(position);
         holder.title.setText(item.getTitle());
         holder.iv.setImageResource(item.getImgResId());
+        holder.mView.setOnClickListener(view -> {
+            if (itemOnClickListener != null) {
+                itemOnClickListener.onClick(position, item);
+            }
+        });
     }
 
     @Override
@@ -65,16 +72,21 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     public class ItemViewHolder extends RecyclerView.ViewHolder {
         ImageView iv;
         TextView title;
+        ConstraintLayout mView;
 
         ItemViewHolder(View itemView, int viewType) {
             super(itemView);
-            if (viewType == VIEW_TYPE_BIG) {
-                iv = (ImageView) itemView.findViewById(R.id.image_list);
-                title = (TextView) itemView.findViewById(R.id.title_list);
-            } else {
-                iv = (ImageView) itemView.findViewById(R.id.image_grid);
-                title = (TextView) itemView.findViewById(R.id.title_grid);
-            }
+            mView = (ConstraintLayout) itemView.findViewById(R.id.view);
+            iv = (ImageView) itemView.findViewById(R.id.image);
+            title = (TextView) itemView.findViewById(R.id.title);
         }
+    }
+
+    public void itemOnClick(ItemOnClickListener listener) {
+        this.itemOnClickListener = listener;
+    }
+
+    public interface ItemOnClickListener {
+        void onClick(int pos, Item item);
     }
 }

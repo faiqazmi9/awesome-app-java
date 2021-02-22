@@ -10,7 +10,7 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/image_list"
+        android:id="@+id/image"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:scaleType="centerCrop"
@@ -20,7 +20,7 @@
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/title_list"
+        android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

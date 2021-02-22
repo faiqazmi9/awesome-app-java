@@ -1,5 +1,6 @@
 package com.example.awesomeappjava;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,6 +80,15 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(itemAdapter);
         recyclerView.setLayoutManager(gridLayoutManager);
+        itemAdapter.itemOnClick((pos, item) -> {
+            Intent intent = new Intent(this, DetailImageActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("title", item.getTitle());
+            bundle.putString("desc", item.getDescription());
+            bundle.putInt("img", item.getImgResId());
+            intent.putExtras(bundle);
+            startActivity(intent);
+        });
     }
 
     private void initItemsData() {
