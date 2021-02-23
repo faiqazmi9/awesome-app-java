@@ -28,9 +28,21 @@ public class DetailImageActivity extends AppCompatActivity {
         ImageView mIv = findViewById(R.id.image);
         TextView mTvTitle = findViewById(R.id.title);
         TextView mTvDescription = findViewById(R.id.description);
+        ImageView mIvBack = findViewById(R.id.iv_back);
 
         mIv.setImageResource(img);
         mTvTitle.setText(title);
         mTvDescription.setText(desc);
+
+        mIvBack.setOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 }

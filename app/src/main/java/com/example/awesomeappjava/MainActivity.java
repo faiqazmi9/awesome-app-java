@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             bundle.putInt("img", item.getImgResId());
             intent.putExtras(bundle);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
         });
     }
 
