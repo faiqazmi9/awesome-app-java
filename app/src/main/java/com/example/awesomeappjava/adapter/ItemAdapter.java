@@ -1,5 +1,6 @@
 package com.example.awesomeappjava.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,15 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.awesomeappjava.R;
 import com.example.awesomeappjava.model.Item;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
+
+import timber.log.Timber;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
     public static final int SPAN_COUNT_ONE = 1;
@@ -22,13 +28,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     private static final int VIEW_TYPE_SMALL = 1;
     private static final int VIEW_TYPE_BIG = 2;
 
-    private List mItems;
+    private List<Item> items;
+    private Context mContext;
     private GridLayoutManager mLayoutManager;
     private ItemOnClickListener itemOnClickListener;
 
-    public ItemAdapter(List items, GridLayoutManager layoutManager) {
-        mItems = items;
-        mLayoutManager = layoutManager;
+    public ItemAdapter(List<Item> items, Context mContext, GridLayoutManager mLayoutManager) {
+        this.items = items;
+        this.mContext = mContext;
+        this.mLayoutManager = mLayoutManager;
     }
 
     @Override
@@ -54,19 +62,39 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        Item item = (Item) mItems.get(position);
-        holder.title.setText(item.getTitle());
-        holder.iv.setImageResource(item.getImgResId());
+
+        final Item response = items.get(position);
+
+        if (StringUtils.isNotEmpty(items.get(position).getSrc().getSmall())) {
+            try {
+                Glide.with(mContext).load(items
+                        .get(position).getSrc().getSmall())
+                        .placeholder(R.drawable.ic_launcher_foreground)
+                        .into(holder.iv);
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        } else {
+            try {
+                Glide.with(mContext).load(R.drawable.ic_launcher_foreground)
+                        .placeholder(R.drawable.ic_launcher_foreground)
+                        .into(holder.iv);
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
+        }
+
+        holder.title.setText(response.getPhotographer());
         holder.mView.setOnClickListener(view -> {
             if (itemOnClickListener != null) {
-                itemOnClickListener.onClick(position, item);
+                itemOnClickListener.onClick(position, response);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return items.size();
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
