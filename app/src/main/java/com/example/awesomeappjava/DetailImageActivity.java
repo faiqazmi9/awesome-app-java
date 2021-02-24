@@ -17,7 +17,7 @@ public class DetailImageActivity extends AppCompatActivity {
 
     private String img = "";
     private String title = "";
-    private String desc = "";
+    private String url = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +29,7 @@ public class DetailImageActivity extends AppCompatActivity {
         assert bundle != null;
         img = bundle.getString("img", "0");
         title = bundle.getString("title", "");
+        url = bundle.getString("url", "");
 
         ImageView mIv = findViewById(R.id.image);
         TextView mTvTitle = findViewById(R.id.title);
@@ -53,7 +54,7 @@ public class DetailImageActivity extends AppCompatActivity {
             }
         }
         mTvTitle.setText(title);
-        mTvDescription.setText(desc);
+        mTvDescription.setText(url);
 
         mIvBack.setOnClickListener(v -> {
             finish();

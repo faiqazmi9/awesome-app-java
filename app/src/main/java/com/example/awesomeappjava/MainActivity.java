@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
             Bundle bundle = new Bundle();
             bundle.putString("img", item.getOriginal());
             bundle.putString("title", item.getPhotographer());
+            bundle.putString("url", item.getPhotographerUrl());
             intent.putExtras(bundle);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
