@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -44,17 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
     MaterialToolbar mToolbar;
 
-    /**
-     * Trigger when swipe.
-     */
-    private boolean isRefresh = false;
+    int pageNumber = 1;
 
-    /**
-     * Total number items on Adapter after last load.
-     */
-    private int previousTotal = 0;
-
-    int pageInit = 1;
+    Boolean isScrolling = false;
+    int currentItems, totalItems, scrollOutItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupToolbar();
         setAdapter();
-        fetchItem(pageInit);
+        fetchItem();
     }
 
     protected void setupToolbar() {
@@ -109,16 +104,40 @@ public class MainActivity extends AppCompatActivity {
         itemAdapter.itemOnClick((pos, item) -> {
             Intent intent = new Intent(this, DetailImageActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putInt("id", item.getId());
+            bundle.putString("img", item.getOriginal());
+            bundle.putString("title", item.getPhotographer());
             intent.putExtras(bundle);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
         });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                currentItems = gridLayoutManager.getChildCount();
+                totalItems = gridLayoutManager.getItemCount();
+                scrollOutItems = gridLayoutManager.findFirstVisibleItemPosition();
+
+                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+                    isScrolling = false;
+                    fetchItem();
+                }
+            }
+        });
     }
 
-    private void fetchItem(int page) {
+    private void fetchItem() {
         StringRequest request = new StringRequest(Request.Method.GET,
-                "https://api.pexels.com/v1/curated/?page=" + page + "&per_page=10", new Response.Listener<String>() {
+                "https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=20", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -152,10 +171,10 @@ public class MainActivity extends AppCompatActivity {
                         items.add(item);
                     }
                     itemAdapter.notifyDataSetChanged();
+                    pageNumber++;
                 } catch (JSONException e) {
 
                 }
-                pageInit = 2;
             }
         }, new Response.ErrorListener() {
             @Override
