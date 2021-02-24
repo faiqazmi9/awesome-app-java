@@ -65,7 +65,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
         final Item response = items.get(position);
 
-        if (StringUtils.isNotEmpty(items.get(position).getOriginal())) {
+        if (StringUtils.isNotEmpty(items.get(position).getTiny())) {
             try {
                 Glide.with(mContext).load(items
                         .get(position).getOriginal())

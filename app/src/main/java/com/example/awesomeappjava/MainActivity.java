@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AbsListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -45,17 +47,19 @@ public class MainActivity extends AppCompatActivity {
     private List<Item> items;
 
     MaterialToolbar mToolbar;
+    TextView mTvError;
 
-    int pageNumber = 1;
+    private int pageNumber = 1;
 
-    Boolean isScrolling = false;
-    int currentItems, totalItems, scrollOutItems;
+    private boolean isScrolling = false;
+    private int totalItems, scrollOutItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mToolbar = findViewById(R.id.toolbar);
+        mTvError = findViewById(R.id.tv_error);
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
@@ -123,11 +127,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                currentItems = gridLayoutManager.getChildCount();
                 totalItems = gridLayoutManager.getItemCount();
-                scrollOutItems = gridLayoutManager.findFirstVisibleItemPosition();
+                scrollOutItems = gridLayoutManager.findLastVisibleItemPosition();
 
-                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+                if (scrollOutItems > totalItems - 2 && dy > 0) {
                     isScrolling = false;
                     fetchItem();
                 }
@@ -137,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchItem() {
         StringRequest request = new StringRequest(Request.Method.GET,
-                "https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=20", new Response.Listener<String>() {
+                "https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=10", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -172,8 +175,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     itemAdapter.notifyDataSetChanged();
                     pageNumber++;
+                    mTvError.setVisibility(View.GONE);
                 } catch (JSONException e) {
-
+                    mTvError.setVisibility(View.VISIBLE);
                 }
             }
         }, new Response.ErrorListener() {
@@ -185,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("Authorization", "563492ad6f91700001000001f6b8454bfc70405ab842826d3658ae80");
+                params.put("Authorization", "563492ad6f91700001000001ce82035986834c05a3757fd52bd5a50d");
                 return params;
             }
         };
