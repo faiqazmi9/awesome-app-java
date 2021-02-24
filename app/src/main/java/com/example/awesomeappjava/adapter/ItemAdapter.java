@@ -65,10 +65,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
         final Item response = items.get(position);
 
-        if (StringUtils.isNotEmpty(items.get(position).getSrc().getSmall())) {
+        if (StringUtils.isNotEmpty(items.get(position).getOriginal())) {
             try {
                 Glide.with(mContext).load(items
-                        .get(position).getSrc().getSmall())
+                        .get(position).getOriginal())
                         .placeholder(R.drawable.ic_launcher_foreground)
                         .into(holder.iv);
             } catch (Exception ex) {

@@ -12,12 +12,25 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.awesomeappjava.adapter.ItemAdapter;
 import com.example.awesomeappjava.model.Item;
 import com.google.android.material.appbar.MaterialToolbar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.awesomeappjava.adapter.ItemAdapter.SPAN_COUNT_ONE;
 import static com.example.awesomeappjava.adapter.ItemAdapter.SPAN_COUNT_TWO;
@@ -27,9 +40,21 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ItemAdapter itemAdapter;
     private GridLayoutManager gridLayoutManager;
-    private List items;
+    private List<Item> items;
 
     MaterialToolbar mToolbar;
+
+    /**
+     * Trigger when swipe.
+     */
+    private boolean isRefresh = false;
+
+    /**
+     * Total number items on Adapter after last load.
+     */
+    private int previousTotal = 0;
+
+    int pageInit = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         setupToolbar();
-        initItemsData();
         setAdapter();
+        fetchItem(pageInit);
     }
 
     protected void setupToolbar() {
@@ -49,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         ActionBar mActionBar = this.getSupportActionBar();
         assert mActionBar != null;
         mToolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
-        mActionBar.setTitle("Nature");
+        mActionBar.setTitle("Awesome App");
     }
 
     @Override
@@ -75,52 +100,78 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setAdapter() {
+        items = new ArrayList<>();
         gridLayoutManager = new GridLayoutManager(this, SPAN_COUNT_ONE);
-        itemAdapter = new ItemAdapter(items, gridLayoutManager);
+        itemAdapter = new ItemAdapter(items, this, gridLayoutManager);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(itemAdapter);
         recyclerView.setLayoutManager(gridLayoutManager);
         itemAdapter.itemOnClick((pos, item) -> {
             Intent intent = new Intent(this, DetailImageActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putString("title", item.getTitle());
-            bundle.putString("desc", item.getDescription());
-            bundle.putInt("img", item.getImgResId());
+            bundle.putInt("id", item.getId());
             intent.putExtras(bundle);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
         });
     }
 
-    private void initItemsData() {
-        items = new ArrayList<>();
-        items.add(new Item(R.drawable.bird, "Bird", "This picture was taken in Punta del Este, Uruguay"));
-        items.add(new Item(R.drawable.bird1, "Bird 1", "Preety little owl"));
-        items.add(new Item(R.drawable.bird2, "Bird 2", "Owl serious mode on"));
-        items.add(new Item(R.drawable.butterfly, "Butterfly", "Very Beautifull Butterfly"));
-        items.add(new Item(R.drawable.cactus, "Cactus", "A cactus is a member of the plant family Cactaceae"));
-        items.add(new Item(R.drawable.fish, "Fish", "This picture was taken in Indonesia"));
-        items.add(new Item(R.drawable.flower, "Flower", "The Red Flower"));
-        items.add(new Item(R.drawable.flower1, "Flower 1", "Beautifull Flower in London, United Kingdom"));
-        items.add(new Item(R.drawable.flower2, "Flower 2", "Calm flower"));
-        items.add(new Item(R.drawable.flower3, "Flower 3", "Beautifull pinky flower"));
-        items.add(new Item(R.drawable.lake, "Lake", "Lake create the reflection"));
-        items.add(new Item(R.drawable.leaf, "Leaf", "Green in the sky"));
-        items.add(new Item(R.drawable.leaf1, "Leaf 1", "In the morning with breezy air"));
-        items.add(new Item(R.drawable.leaf2, "Leaf 2", "Leaf with darkness"));
-        items.add(new Item(R.drawable.leaf3, "Leaf 3", "Mexican leaf"));
-        items.add(new Item(R.drawable.moon, "Moon", "Reaching the moon"));
-        items.add(new Item(R.drawable.mountain, "Mountain", "Great mount with lake"));
-        items.add(new Item(R.drawable.mountain1, "Mountain 1", "the blue dew faded at the horizon"));
-        items.add(new Item(R.drawable.mountain2, "Mountain 2", "cheerful camper"));
-        items.add(new Item(R.drawable.mountain3, "Mountain 3", "United States Great Mount"));
-        items.add(new Item(R.drawable.mushroom, "Moshroom", "Li'l Mushroom"));
-        items.add(new Item(R.drawable.ocean, "Ocean", "Oceanic animal"));
-        items.add(new Item(R.drawable.rainbow, "Rainbow", "Happy rainbow"));
-        items.add(new Item(R.drawable.tree, "Tree", "Holaa Beach ..."));
-        items.add(new Item(R.drawable.waterfall, "Waterfall", "Amazing waterfall"));
-        items.add(new Item(R.drawable.wave, "Wave", "Wave the ocean"));
-        items.add(new Item(R.drawable.wave1, "Wave 1", "Hi beautifull beach"));
-        items.add(new Item(R.drawable.wave2, "Wave 2", "Lets Surf!"));
+    private void fetchItem(int page) {
+        StringRequest request = new StringRequest(Request.Method.GET,
+                "https://api.pexels.com/v1/curated/?page=" + page + "&per_page=10", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("photos");
+
+                    int length = jsonArray.length();
+                    for (int i = 0; i < length; i++) {
+                        JSONObject object = jsonArray.getJSONObject(i);
+                        int id = object.getInt("id");
+                        int width = object.getInt("width");
+                        int height = object.getInt("height");
+                        String url = object.getString("url");
+                        String photographer = object.getString("photographer");
+                        String photographerUrl = object.getString("photographer_url");
+                        int photographerId = object.getInt("photographer_id");
+                        String avgColor = object.getString("avg_color");
+
+                        JSONObject objectImages = object.getJSONObject("src");
+                        String original = objectImages.getString("original");
+                        String large2x = objectImages.getString("large2x");
+                        String large = objectImages.getString("large");
+                        String medium = objectImages.getString("medium");
+                        String small = objectImages.getString("small");
+                        String portrait = objectImages.getString("portrait");
+                        String landscape = objectImages.getString("landscape");
+                        String tiny = objectImages.getString("tiny");
+
+                        Item item = new Item(id, width, height, url, photographer, photographerUrl, photographerId,
+                                avgColor, original, large2x, large, medium, small, portrait, landscape, tiny);
+                        items.add(item);
+                    }
+                    itemAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+
+                }
+                pageInit = 2;
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "563492ad6f91700001000001f6b8454bfc70405ab842826d3658ae80");
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(request);
     }
 }
