@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("Authorization", "563492ad6f91700001000001ce82035986834c05a3757fd52bd5a50d");
+                params.put("Authorization", "ApiKey");
                 return params;
             }
         };
